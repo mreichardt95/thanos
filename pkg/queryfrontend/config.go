@@ -89,13 +89,23 @@ func NewCacheConfig(logger log.Logger, confContentYaml []byte) (*cortexcache.Con
 		}
 
 		if config.Expiration == 0 {
-			level.Warn(logger).Log("msg", "memcached cache valid time set to 0, so using a default of 24 hours expiration time")
+			level.Debug(logger).Log("msg", "memcached cache valid time not set or invalid, so using a default of 24 hours expiration time")
 			config.Expiration = 24 * time.Hour
 		}
 
 		if config.Memcached.DNSProviderUpdateInterval <= 0 {
-			level.Warn(logger).Log("msg", "memcached dns provider update interval time set to invalid value, defaulting to 10s")
+			level.Debug(logger).Log("msg", "memcached dns provider update interval time not set or invalid, defaulting to 10s")
 			config.Memcached.DNSProviderUpdateInterval = 10 * time.Second
+		}
+
+		if config.Memcached.MaxAsyncBufferSize <= 0 {
+			level.Debug(logger).Log("msg", "max_async_buffer_size not set or invalid, defaulting to 10000")
+			config.Memcached.MaxAsyncBufferSize = 10000
+		}
+
+		if config.Memcached.MaxAsyncConcurrency <= 0 {
+			level.Debug(logger).Log("msg", "max_async_buffer_size not set or invalid, defaulting to 10")
+			config.Memcached.MaxAsyncConcurrency = 10
 		}
 
 		return &cortexcache.Config{
